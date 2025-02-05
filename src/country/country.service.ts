@@ -1,73 +1,124 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CountriesListDto } from './dto/add-country.dto';
-import { PatchCountryDto } from './dto/patch-country.dto';
+import { createCountry, updateCountry } from './dto/add-country.dto';
 import { Validate } from 'class-validator';
 @Injectable()
 export class CountryService {
   constructor(
+    /**
+     * inject countryRepository
+     */
+
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
-  ) {}
+  ) { }
 
-  // Add new country
-  public async addCountry(countryData: CountriesListDto) {
-    const existingCountry = await this.countryRepository.findOne({
+  // public async addCountry(countryData: createCountry) {
+  //   await this.countryRepository.findOne({
+  //     where: { code: countryData.code },
+  //   });
+
+  //   const newCountry = await this.countryRepository.create(countryData);
+  //   return await this.countryRepository.save(newCountry);
+  // }
+
+  public async addCountry(countryData: createCountry) {
+    await this.countryRepository.findOne({
       where: { code: countryData.code },
     });
 
-    if (existingCountry) {
-      throw new BadRequestException('Country with this code already exists.');
-    }
-
-    const newCountry = this.countryRepository.create(countryData);
+    const newCountry = await this.countryRepository.create(countryData);
     return await this.countryRepository.save(newCountry);
   }
+  // public async updateCountry(updateCountryDataDto: updateCountry) {
+  //   //find the country
+  //   const existantCountry = await this.countryRepository.findOneBy({
+  //     id: updateCountryDataDto.id,
+  //   });
 
-  // Update existing country
-  public async updateCountry(updateCountryDataDto: PatchCountryDto) {
-    const existantCountry = await this.countryRepository.findOne({
-      where: { id: updateCountryDataDto.id },
-    });
+  //   //update country
+  //   existantCountry.cName = updateCountryDataDto.cName ?? existantCountry.cName;
+  //   existantCountry.code = updateCountryDataDto.code ?? existantCountry.code;
+  //   existantCountry.flag = updateCountryDataDto.flag ?? existantCountry.flag;
 
-    if (!existantCountry) {
-      throw new BadRequestException('Country not found.');
-    }
+  //   //save updated country
+  //   return await this.countryRepository.save(existantCountry);
+  // }
 
-    existantCountry.cName = updateCountryDataDto.cName ?? existantCountry.cName;
-    existantCountry.code = updateCountryDataDto.code ?? existantCountry.code;
-    existantCountry.flag = updateCountryDataDto.flag ?? existantCountry.flag;
+  // public async deleteCountry(id: number): Promise<Country> {
+  //   const country = await this.countryRepository.findOne({
+  //     relations: { timeseries: true },
+  //     where: { id: id },
+  //   });
+  //   if (country.timeseries.length > 0) {
+  //     throw new BadRequestException(
+  //       'This country is not deleted because, it have timeseries data.',
+  //     );
+  //   }
+  //   return await this.countryRepository.remove(country);
+  // }
+  public async updateCountry(updateCountryDataDto: updateCountry) {
+  // Step 1: Find the existing country
+  const existantCountry = await this.countryRepository.findOneBy({
+    id: updateCountryDataDto.id,
+  });
 
-    return await this.countryRepository.save(existantCountry);
+  // Step 2: Handle case where country does not exist
+  if (!existantCountry) {
+    throw new NotFoundException(`Country with ID ${updateCountryDataDto.id} not found.`);
   }
 
-  // Delete country if no timeseries data exists
-  public async deleteCountry(id: number): Promise<Country> {
+  // Step 3: Check if the new code or flag already exists in another country
+  if (updateCountryDataDto.code || updateCountryDataDto.flag) {
+    const existingCountry = await this.countryRepository.findOne({
+      where: [
+        { code: updateCountryDataDto.code },
+        { flag: updateCountryDataDto.flag },
+      ],
+    });
+
+    if (existingCountry && existingCountry.id !== existantCountry.id) {
+      throw new BadRequestException(`Another country already has this flag or code.`);
+    }
+  }
+
+  // Step 4: Update the country fields only if they are provided
+  if (updateCountryDataDto.cName) existantCountry.cName = updateCountryDataDto.cName;
+  if (updateCountryDataDto.code) existantCountry.code = updateCountryDataDto.code;
+  if (updateCountryDataDto.flag) existantCountry.flag = updateCountryDataDto.flag;
+
+  // Step 5: Save updated country
+  return await this.countryRepository.save(existantCountry);
+}
+public async deleteCountry(id: number): Promise<Country> {
+  const country = await this.countryRepository.findOne({
+    relations: { timeseries: true },
+    where: { id: id },
+  });
+
+  if (!country) {
+    throw new NotFoundException(`Country with ID ${id} not found.`);
+  }
+
+  if (country.timeseries && country.timeseries.length > 0) {
+    throw new BadRequestException(`This country cannot be deleted because it has timeseries data.`);
+  }
+
+  return await this.countryRepository.remove(country);
+}
+
+  public async getCountry(id: number) {
     const country = await this.countryRepository.findOne({
       where: { id: id },
-      relations: ['timeseries'],
     });
 
-    if (!country) {
-      throw new BadRequestException('Country not found.');
-    }
-
-    if (country.timeseries.length > 0) {
-      throw new BadRequestException(
-        'This country cannot be deleted because it has timeseries data.',
-      );
-    }
-
-    return await this.countryRepository.remove(country);
-  }
-
-  // Get a country by ID
-  public async getCountry(id: number) {
-    return await this.countryRepository.findOne({
+    if (!country) throw new NotFoundException('Coutnry is not found.');
+    const data = await this.countryRepository.findOne({
+      relations: { timeseries: true },
       where: { id: id },
-      relations: ['timeseries'],
     });
+    return data;
   }
 }

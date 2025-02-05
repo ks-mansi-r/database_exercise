@@ -1,6 +1,7 @@
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   IsNotEmpty,
+  IsInt,
   IsNumber,
   IsString,
   Matches,
@@ -26,6 +27,9 @@ export class createData {
   @IsNotEmpty()
   @IsNumber()
   recovered: number;
+  // @IsInt()
+  // @IsNotEmpty()
+  // countryId: number;
 }
 
 @UsePipes(new ValidationPipe())
@@ -34,7 +38,11 @@ export class createTimeseries {
   @IsNotEmpty()
   name: string;
 
-  @ValidateNested()
+  // @IsInt()
+  // @IsNotEmpty()
+  // countryId: number; // Move countryId here
+
+  @ValidateNested({ each: true })
   @Type(() => createData)
   data: createData[];
 }
@@ -50,15 +58,15 @@ export class updateTimeseries {
 
   @IsNotEmpty()
   @IsNumber()
-  confirmed: number;
+  confirmed?: number;
 
   @IsNotEmpty()
   @IsNumber()
-  deaths: number;
+  deaths?: number;
 
   @IsNotEmpty()
   @IsNumber()
-  recovered: number;
+  recovered?: number;
 }
 
 export class deleteTimeseries {

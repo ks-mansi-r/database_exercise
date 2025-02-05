@@ -1,17 +1,44 @@
-// add-country.dto.ts (CreateCountryDto)
-import { IsString, IsNotEmpty, IsISO31661Alpha2 } from 'class-validator';
+// import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CountriesListDto {
+export class createCountry {
+  
   @IsString()
   @IsNotEmpty()
-  cName: string; // Country Name
+  cName: string;
 
+ 
   @IsString()
   @IsNotEmpty()
-  // @IsISO31661Alpha2() // Ensures it's a valid ISO country code
-  code: string; // Country ISO code
+  flag: string;
 
+  
   @IsString()
   @IsNotEmpty()
-  flag: string; // Country flag
+  code: string;
+}
+
+export class updateCountry {
+ 
+  @IsNotEmpty()
+  @IsInt()
+  id: number;
+
+  
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  cName?: string;
+
+  
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  flag?: string;
+
+  
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  code?: string;
 }

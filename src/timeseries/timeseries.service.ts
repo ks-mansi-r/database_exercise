@@ -16,6 +16,11 @@ export class TimeseriesService {
   ) {}
 
   public async createTimeseries(data: createTimeseries) {
+    console.log('Received DTO:', data); // Check if dto is undefined
+    console.log('DTO Keys:', Object.keys(data)); // Check available fields
+    console.log('DTO Name:', data.name); // Check if dto.name is undefined
+    console.log('DTO Name Length:', data.name?.length);
+    
     for (let i = 0; i < data.data.length; i++) {
       const existingData = await this.timeseriesRepository.findOne({
         where: { date: data.data[i].date, name: data.name },
