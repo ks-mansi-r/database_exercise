@@ -2,36 +2,36 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { GetExcelDto } from './dto/get-excel-data.dto';
 import { ExcelService } from './excel.service';
-
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('excel')
-
+@ApiTags('Data in excel file')
 export class ExcelController {
   constructor(private readonly excelService: ExcelService) {}
   @Get()
-//   @ApiOperation({
-//     summary: 'an endpoint to download the data in Excel ',
-//   })
-//   @ApiResponse({
-//     status: 200,
-//     description:
-//       'return a Excel file with total confirmed, total deadths, total recovered for each country for each month',
-//   })
-//   @ApiQuery({
-//     name: 'isoCodes',
-//     type: 'string',
-//     required: false,
-//     description:
-//       'return countries data in excel based on iso code given in query',
-//     example: 'IN',
-//   })
-//   @ApiQuery({
-//     name: 'year',
-//     type: 'number',
-//     required: false,
-//     description: 'return countries data in excel based on year given in query',
-//     example: 2021,
-//   })
+  @ApiOperation({
+    summary: 'an endpoint to download the data in Excel ',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'return a Excel file with total confirmed, total deadths, total recovered for each country for each month',
+  })
+  @ApiQuery({
+    name: 'isoCodes',
+    type: 'string',
+    required: false,
+    description:
+      'return countries data in excel based on iso code given in query',
+    example: 'IN',
+  })
+  @ApiQuery({
+    name: 'year',
+    type: 'number',
+    required: false,
+    description: 'return countries data in excel based on year given in query',
+    example: 2021,
+  })
   async downloadCovidData(@Query() query: GetExcelDto, @Res() res: Response) {
     try {
       const { isoCodes, year } = query;
