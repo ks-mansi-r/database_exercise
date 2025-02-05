@@ -11,6 +11,7 @@ import { CwisecasesModule } from './covid-data/cwisecases/cwisecases.module';
 import { CcasesModule } from './covid-data/countrycases/ccases.module';
 import { MwisecasesModule } from './covid-data/monthlycases/mwisecases.module';
 import { TopcasesModule } from './covid-data/top countries/topcases.module';
+import { ExcelModule } from './covid-data/excel/excel.module';
 
 @Module({
   imports: [CountryModule,
@@ -20,6 +21,7 @@ import { TopcasesModule } from './covid-data/top countries/topcases.module';
    CcasesModule,
    MwisecasesModule,
    TopcasesModule,
+   ExcelModule,
     TypeOrmModule.forRootAsync({
       useFactory:() =>({
     type: 'postgres',
