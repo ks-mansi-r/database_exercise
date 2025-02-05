@@ -9,6 +9,7 @@ import { TimeSeries } from './timeseries/entity/timeseries.entity';
 import { CountrylistModule } from './covid-data/countrylist/countrylist.module';
 import { CwisecasesModule } from './covid-data/cwisecases/cwisecases.module';
 import { CcasesModule } from './covid-data/countrycases/ccases.module';
+import { MwisecasesModule } from './covid-data/monthlycases/mwisecases.module';
 
 @Module({
   imports: [CountryModule,
@@ -16,6 +17,7 @@ import { CcasesModule } from './covid-data/countrycases/ccases.module';
    CountrylistModule,
    CwisecasesModule,
    CcasesModule,
+   MwisecasesModule,
     TypeOrmModule.forRootAsync({
       useFactory:() =>({
     type: 'postgres',
