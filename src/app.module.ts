@@ -10,6 +10,7 @@ import { CountrylistModule } from './covid-data/countrylist/countrylist.module';
 import { CwisecasesModule } from './covid-data/cwisecases/cwisecases.module';
 import { CcasesModule } from './covid-data/countrycases/ccases.module';
 import { MwisecasesModule } from './covid-data/monthlycases/mwisecases.module';
+import { TopcasesModule } from './covid-data/top countries/topcases.module';
 
 @Module({
   imports: [CountryModule,
@@ -18,6 +19,7 @@ import { MwisecasesModule } from './covid-data/monthlycases/mwisecases.module';
    CwisecasesModule,
    CcasesModule,
    MwisecasesModule,
+   TopcasesModule,
     TypeOrmModule.forRootAsync({
       useFactory:() =>({
     type: 'postgres',
