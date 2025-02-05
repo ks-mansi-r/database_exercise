@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 // import { GetCountriesList } from './dtos/get-country-list.dto';
-import { GetCountriesList } from './countrylist/dto/get-country-list.dto';
-import { CountrylistService } from './countrylist/countrylist.service';
+import { GetCountriesList } from './dto/get-country-list.dto';
+import { CountrylistService } from './countrylist.service';
 
 @Controller('countrylist')
 
