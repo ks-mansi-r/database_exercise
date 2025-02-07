@@ -1,9 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, RequestTimeoutException } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createCountry, updateCountry } from './dto/add-country.dto';
 import { Validate } from 'class-validator';
+import { PaginationProvider } from 'src/common/provider/pagination.provider';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+
 @Injectable()
 export class CountryService {
   constructor(
@@ -13,9 +16,38 @@ export class CountryService {
 
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
+
+    // inject datasource
+    private readonly dataSource : DataSource,
+
+    //inject paginationprovider
+    private readonly paginationProvider:PaginationProvider,
   ) { }
 
+  
+  // for add country data
   public async addCountry(countryData: createCountry) {
+
+    //Create a query runner
+    const queryRunner = this. dataSource.createQueryRunner();
+
+
+    //connect query runner 
+    await queryRunner.connect();
+
+    //start Transaction
+    await queryRunner.startTransaction();
+    try{
+
+    }catch(error){
+      throw new RequestTimeoutException(
+        'Not connect to the database',
+      );
+    }
+
+
+    // if the ISO code already exists, return a 409 Conflict error.
+    try{
     await this.countryRepository.findOne({
       where: { code: countryData.code },
     });
@@ -23,8 +55,39 @@ export class CountryService {
     const newCountry = await this.countryRepository.create(countryData);
     return await this.countryRepository.save(newCountry);
   }
+  catch(error){
+    throw new ConflictException(
+      'Data is already exist for this Iso Code',
+      {
+        description:String(error),
+      },
+    );
+  }
+  finally{
+    try{
+      //release the connection 
+      await queryRunner.release();
+      
+    }
+    catch(error){
+      throw new RequestTimeoutException(
+        
+        'NOt Release the connection ',
+        {
+          description:String(Error),
+        }
+      );
+
+    }
+  }
+  }
   
+
+
+  //for update country data
   public async updateCountry(updateCountryDataDto: updateCountry) {
+
+    try{
   // Step 1: Find the existing country
   const existantCountry = await this.countryRepository.findOneBy({
     id: updateCountryDataDto.id,
@@ -56,8 +119,16 @@ export class CountryService {
 
   // Step 5: Save updated country
   return await this.countryRepository.save(existantCountry);
+}catch(error){
+  throw new NotFoundException(
+    'For this ID country is not found',
+  );
 }
+}
+
+// delete a country
 public async deleteCountry(id: number): Promise<Country> {
+  try{
   const country = await this.countryRepository.findOne({
     relations: { timeseries: true },
     where: { id: id },
@@ -72,9 +143,20 @@ public async deleteCountry(id: number): Promise<Country> {
   }
 
   return await this.countryRepository.remove(country);
+}catch(error){
+  throw new NotFoundException(
+    'For this ID country is not found',
+  );
+}
 }
 
+
+
   public async getCountry(id: number) {
+
+    //if the countryId is not found, return a 404 error with an appropriate error message.
+    
+    try{
     const country = await this.countryRepository.findOne({
       where: { id: id },
     });
@@ -85,5 +167,26 @@ public async deleteCountry(id: number): Promise<Country> {
       where: { id: id },
     });
     return data;
+  }
+  
+  catch(error){
+    //throw a 404 error if country is not found
+          throw new NotFoundException('Country is not found for this id ');
+  }
+  }
+
+  public async getAllCountry(countryQuery: PaginationQueryDto) {
+    try {
+      const country = await this.paginationProvider.paginateQuery(
+        {
+          limit: countryQuery.limit,
+          page: countryQuery.page,
+        },
+        this.countryRepository,
+      );
+      return country;
+    } catch (error) {
+      throw new NotFoundException('Data is not available');
+    }
   }
 }

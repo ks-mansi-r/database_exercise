@@ -9,22 +9,19 @@ export class Country {
   @Column({
     type: 'varchar',
     nullable: false, 
-    // default: 'Unknown'  // Ensure no null values for country name
-    unique: true,     // Ensure the country name is unique
+    unique: true,     
   })
   cName: string;
 
   @Column({
-    type: 'varchar',
-    // nullable: true,   // Allow flag to be null if it's not required
-    unique: true,     // Ensure the flag is unique, if applicable
+    type: 'varchar',  
+    unique: true,     
   })
   flag: string;
 
   @Column({
     type: 'varchar',
-    // nullable: false,  // Ensure the code is not null
-    unique: true,     // Ensure the ISO code is unique
+    unique: true,  
   })
   code: string;
 
