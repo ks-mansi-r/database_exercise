@@ -3,7 +3,8 @@ import { TimeSeries } from './entity/timeseries.entity';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createTimeseries, updateTimeseries, deleteTimeseries } from './dto/timeseries.dto';
-
+import { PaginationProvider } from 'src/common/provider/pagination.provider';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 @Injectable()
 export class TimeseriesService {
   constructor(
@@ -16,6 +17,9 @@ export class TimeseriesService {
 
     //Inject datasource 
     private readonly datasource: DataSource,
+
+    //inject paginationprovider
+    private readonly paginationProvider: PaginationProvider,
   ) {}
 
 
@@ -146,5 +150,20 @@ finally{
     const month = new Date(date).getMonth() + 1;
     if (isNaN(time) || !date_ || !month || !year)
       throw new BadRequestException('this Date is not valid');
+  }
+  public async getTimeseries(timeseriesQuery: PaginationQueryDto) {
+    try {
+      const timeseries = await this.paginationProvider.paginateQuery(
+        {
+
+          limit: timeseriesQuery.limit,
+          page: timeseriesQuery.page,
+        },
+        this.timeseriesRepository,
+      );
+      return timeseries;
+    } catch (error) {
+      throw new NotFoundException('Data is not available');
+    }
   }
 }

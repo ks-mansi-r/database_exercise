@@ -1,18 +1,7 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    ParseIntPipe,
-    Patch,
-    Put,
-    Post,
-    Query,
+import {Body,Controller,Delete,Get,Param,ParseIntPipe,Patch,Put,Post,Query,
   } from '@nestjs/common';
  import { CountryService } from './country.service';
-//  import { CountriesListDto } from './dto/add-country.dto';
-//   import { PatchCountryDto } from './dto/patch-country.dto';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
   import { createCountry, updateCountry } from './dto/add-country.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
   
@@ -73,5 +62,18 @@ export class CountryController {
   })
   public getCountry(@Param('id', ParseIntPipe) id: number) {
     return this.countryService.getCountry(id);
+  }
+
+//get all country data
+  @Get()
+  @ApiOperation({
+    summary: 'get all country',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfuly get country data',
+  })
+  public grtAllCountry(@Query() countryQuery: PaginationQueryDto) {
+    return this.countryService.getAllCountry(countryQuery);
   }
 }

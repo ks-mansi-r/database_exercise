@@ -4,6 +4,9 @@ import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createCountry, updateCountry } from './dto/add-country.dto';
 import { Validate } from 'class-validator';
+import { PaginationProvider } from 'src/common/provider/pagination.provider';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+
 @Injectable()
 export class CountryService {
   constructor(
@@ -16,6 +19,9 @@ export class CountryService {
 
     // inject datasource
     private readonly dataSource : DataSource,
+
+    //inject paginationprovider
+    private readonly paginationProvider:PaginationProvider,
   ) { }
 
   
@@ -167,5 +173,20 @@ public async deleteCountry(id: number): Promise<Country> {
     //throw a 404 error if country is not found
           throw new NotFoundException('Country is not found for this id ');
   }
+  }
+
+  public async getAllCountry(countryQuery: PaginationQueryDto) {
+    try {
+      const country = await this.paginationProvider.paginateQuery(
+        {
+          limit: countryQuery.limit,
+          page: countryQuery.page,
+        },
+        this.countryRepository,
+      );
+      return country;
+    } catch (error) {
+      throw new NotFoundException('Data is not available');
+    }
   }
 }
