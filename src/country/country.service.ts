@@ -1,5 +1,5 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, RequestTimeoutException } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createCountry, updateCountry } from './dto/add-country.dto';
@@ -13,11 +13,33 @@ export class CountryService {
 
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
+
+    // inject datasource
+    private readonly dataSource : DataSource,
   ) { }
 
   
   // for add country data
   public async addCountry(countryData: createCountry) {
+
+    //Create a query runner
+    const queryRunner = this. dataSource.createQueryRunner();
+
+
+    //connect query runner 
+    await queryRunner.connect();
+
+    //start Transaction
+    await queryRunner.startTransaction();
+    try{
+
+    }catch(error){
+      throw new RequestTimeoutException(
+        'Not connect to the database',
+      );
+    }
+
+
     // if the ISO code already exists, return a 409 Conflict error.
     try{
     await this.countryRepository.findOne({
@@ -35,12 +57,31 @@ export class CountryService {
       },
     );
   }
+  finally{
+    try{
+      //release the connection 
+      await queryRunner.release();
+      
+    }
+    catch(error){
+      throw new RequestTimeoutException(
+        
+        'NOt Release the connection ',
+        {
+          description:String(Error),
+        }
+      );
+
+    }
+  }
   }
   
 
 
   //for update country data
   public async updateCountry(updateCountryDataDto: updateCountry) {
+
+    try{
   // Step 1: Find the existing country
   const existantCountry = await this.countryRepository.findOneBy({
     id: updateCountryDataDto.id,
@@ -72,10 +113,16 @@ export class CountryService {
 
   // Step 5: Save updated country
   return await this.countryRepository.save(existantCountry);
+}catch(error){
+  throw new NotFoundException(
+    'For this ID country is not found',
+  );
+}
 }
 
 // delete a country
 public async deleteCountry(id: number): Promise<Country> {
+  try{
   const country = await this.countryRepository.findOne({
     relations: { timeseries: true },
     where: { id: id },
@@ -90,6 +137,11 @@ public async deleteCountry(id: number): Promise<Country> {
   }
 
   return await this.countryRepository.remove(country);
+}catch(error){
+  throw new NotFoundException(
+    'For this ID country is not found',
+  );
+}
 }
 
 
