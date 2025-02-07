@@ -73,6 +73,8 @@ export class CountryService {
   // Step 5: Save updated country
   return await this.countryRepository.save(existantCountry);
 }
+
+// delete a country
 public async deleteCountry(id: number): Promise<Country> {
   const country = await this.countryRepository.findOne({
     relations: { timeseries: true },
@@ -90,7 +92,13 @@ public async deleteCountry(id: number): Promise<Country> {
   return await this.countryRepository.remove(country);
 }
 
+
+
   public async getCountry(id: number) {
+
+    //if the countryId is not found, return a 404 error with an appropriate error message.
+    
+    try{
     const country = await this.countryRepository.findOne({
       where: { id: id },
     });
@@ -101,5 +109,11 @@ public async deleteCountry(id: number): Promise<Country> {
       where: { id: id },
     });
     return data;
+  }
+  
+  catch(error){
+    //throw a 404 error if country is not found
+          throw new NotFoundException('Country is not found for this id ');
+  }
   }
 }
