@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,7 +15,11 @@ export class CountryService {
     private readonly countryRepository: Repository<Country>,
   ) { }
 
+  
+  // for add country data
   public async addCountry(countryData: createCountry) {
+    // if the ISO code already exists, return a 409 Conflict error.
+    try{
     await this.countryRepository.findOne({
       where: { code: countryData.code },
     });
@@ -23,7 +27,19 @@ export class CountryService {
     const newCountry = await this.countryRepository.create(countryData);
     return await this.countryRepository.save(newCountry);
   }
+  catch(error){
+    throw new ConflictException(
+      'Data is already exist for this Iso Code',
+      {
+        description:String(error),
+      },
+    );
+  }
+  }
   
+
+
+  //for update country data
   public async updateCountry(updateCountryDataDto: updateCountry) {
   // Step 1: Find the existing country
   const existantCountry = await this.countryRepository.findOneBy({
