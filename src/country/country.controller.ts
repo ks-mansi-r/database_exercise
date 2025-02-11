@@ -2,7 +2,7 @@ import {Body,Controller,Delete,Get,Param,ParseIntPipe,Patch,Put,Post,Query,
   } from '@nestjs/common';
  import { CountryService } from './country.service';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-  import { createCountry, updateCountry } from './dto/add-country.dto';
+  import { CreateCountry, updateCountry } from './dto/add-country.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
   
 @Controller('country')
@@ -23,7 +23,7 @@ export class CountryController {
     status: 200,
     description: 'Successfuly add country data',
   })
-  public addCountry(@Body() countryDto: createCountry) {
+  public addCountry(@Body() countryDto: CreateCountry) {
     return this.countryService.addCountry(countryDto);
   }
 
