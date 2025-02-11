@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException, 
 import { DataSource, Repository } from 'typeorm';
 import { Country } from './entity/country.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { createCountry, updateCountry } from './dto/add-country.dto';
+import { CreateCountry, updateCountry } from './dto/add-country.dto';
 import { Validate } from 'class-validator';
 import { PaginationProvider } from 'src/common/provider/pagination.provider';
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
@@ -26,7 +26,7 @@ export class CountryService {
 
   
   // for add country data
-  public async addCountry(countryData: createCountry) {
+  public async addCountry(countryData: CreateCountry) {
 
     //Create a query runner
     const queryRunner = this. dataSource.createQueryRunner();
@@ -113,7 +113,7 @@ export class CountryService {
   }
 
   // Step 4: Update the country fields only if they are provided
-  if (updateCountryDataDto.cName) existantCountry.cName = updateCountryDataDto.cName;
+  if (updateCountryDataDto.Name) existantCountry.cName = updateCountryDataDto.Name;
   if (updateCountryDataDto.code) existantCountry.code = updateCountryDataDto.code;
   if (updateCountryDataDto.flag) existantCountry.flag = updateCountryDataDto.flag;
 

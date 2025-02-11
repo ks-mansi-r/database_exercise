@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class createCountry {
+export class CreateCountry {
   @ApiProperty({
     description: 'The name of the Country.',
     example: 'India',
   })
   @IsString()
   @IsNotEmpty()
-  cName: string;
+  Name: string;
 
  
   @ApiProperty({
@@ -47,7 +47,7 @@ export class updateCountry {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
-  cName?: string;
+  Name?: string;
 
   @ApiProperty({
     description: 'The flag of the country',
