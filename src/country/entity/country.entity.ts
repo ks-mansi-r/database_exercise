@@ -1,4 +1,4 @@
-import { TimeSeries } from 'src/timeseries/entity/timeseries.entity';
+import { TimeSeries } from '../../timeseries/entity/timeseries.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -11,7 +11,7 @@ export class Country {
     nullable: false, 
     unique: true,     
   })
-  cName: string;
+  Name: string;
 
   @Column({
     type: 'varchar',  

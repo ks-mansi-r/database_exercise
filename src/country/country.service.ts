@@ -113,7 +113,7 @@ export class CountryService {
   }
 
   // Step 4: Update the country fields only if they are provided
-  if (updateCountryDataDto.Name) existantCountry.cName = updateCountryDataDto.Name;
+  if (updateCountryDataDto.Name) existantCountry.Name = updateCountryDataDto.Name;
   if (updateCountryDataDto.code) existantCountry.code = updateCountryDataDto.code;
   if (updateCountryDataDto.flag) existantCountry.flag = updateCountryDataDto.flag;
 

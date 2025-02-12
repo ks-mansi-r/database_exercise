@@ -6,12 +6,12 @@ import { TimeseriesModule } from './timeseries/timeseries.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Country } from './country/entity/country.entity';
 import { TimeSeries } from './timeseries/entity/timeseries.entity';
-import { CountrylistModule } from './covid-data/countrylist/countrylist.module';
-import { CwisecasesModule } from './covid-data/cwisecases/cwisecases.module';
-import { CcasesModule } from './covid-data/countrycases/ccases.module';
-import { MwisecasesModule } from './covid-data/monthlycases/mwisecases.module';
-import { TopcasesModule } from './covid-data/top countries/topcases.module';
-import { ExcelModule } from './covid-data/excel/excel.module';
+import { CountrylistModule } from './get-all-data/countrylist/countrylist.module';
+import { CwisecasesModule } from './get-all-data/cwisecases/cwisecases.module';
+import { CcasesModule } from './get-all-data/countrycases/ccases.module';
+import { MwisecasesModule } from './get-all-data/monthlycases/mwisecases.module';
+import { TopcasesModule } from './get-all-data/top countries/topcases.module';
+import { ExcelModule } from './get-all-data/excel/excel.module';
 
 @Module({
   imports: [CountryModule,

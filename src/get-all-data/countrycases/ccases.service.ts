@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Country } from 'src/country/entity/country.entity';
-import { TimeSeries } from 'src/timeseries/entity/timeseries.entity';
+import { Country } from '../../country/entity/country.entity';
+import { TimeSeries } from '../../timeseries/entity/timeseries.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -51,7 +51,7 @@ export class CcasesService {
       });
 
       if (country) {
-        const countryName = country.cName;
+        const countryName = country.Name;
 
         let countryData = await this.timeseriesRepo.find({
           where: {
